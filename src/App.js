@@ -1,5 +1,7 @@
 import React from "react";
 import axios from "axios";
+import Movie from "./Movie";
+import "./App.css";
 // import PropTypes from "prop-types"; // ES6
 
 class App extends React.Component {
@@ -10,20 +12,45 @@ class App extends React.Component {
 
   getMovies = async () => {
     const response = await axios.get(
-      "https://yts-proxy.now.sh/list_movies.json"
+      "https://yts.lt/api/v2/list_movies.json?sort_by=rating"
     );
 
-    return response.data.movies;
+    let movies = response.data.data.movies;
+
+    this.setState({
+      movies: movies,
+      isLoading: false
+    });
   };
 
   componentDidMount() {
-    console.log(this.getMovies());
+    this.getMovies();
   }
 
   render() {
+    const { isLoading, movies } = this.state;
     return (
-      <div>
-        {this.state.isLoading === true ? "Loading..." : "We are ready."}
+      <div className="container">
+        <div className="row mt-3">
+          {isLoading ? (
+            <div className="col-12">
+              <p>Loading...</p>
+            </div>
+          ) : (
+            movies.map(movie => (
+              <Movie
+                key={movie.id}
+                id={movie.id}
+                year={movie.year}
+                rating={movie.rating}
+                genres={movie.genres}
+                title={movie.title}
+                summary={movie.summary}
+                poster={movie.medium_cover_image}
+              />
+            ))
+          )}
+        </div>
       </div>
     );
   }
